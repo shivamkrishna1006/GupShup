@@ -22,6 +22,8 @@ try {
         return res.json({success:false,message:"user already exist"})   
     }
 
+    //avatar ko loge 
+
     const salt= await bcrypt.genSalt(10);
     const hashedPassword= await bcrypt.hash(password,salt);
 
@@ -29,7 +31,7 @@ try {
         fullName,email,password:hashedPassword,bio
     });
 
-    const token= generateToken(newUser._id)
+    const token = generateToken(newUser._id)
 
     return res.json({success:true,userData:newUser,token,message:"Account Created Successfully"}) 
 
@@ -63,9 +65,16 @@ export const login = async (req, res) => {
     }
 
     // generate token
-    const token = generateToken(userData._id);
+   const token =  generateToken(userData._id);
+   //const token = generateToken(userData._id);
+   //console.log(typeof token, token);
 
-    res.json({ success: true, userData, token, message: "Login successful" });
+
+   
+    const userDataFetched = await User.findOne({ email }).select("-password");
+
+
+    res.json({ success: true, userDataFetched, token, message: "Login successful" });
 
   } catch (error) {
     console.log(error.message);
@@ -104,5 +113,25 @@ res.json({ success: true, updatedUser });
     res.json({success:false,message:error.message})
 }
 }
+
+// controllers/authController.js
+// controllers/authController.js
+
+export const logout = (req, res) => {
+  try {
+    // Clear the JWT cookie
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // true in production
+      sameSite: "strict",
+    });
+
+    return res.json({ success: true, message: "Logged out successfully" });
+  } catch (error) {
+    console.log(error.message);
+    return res.json({ success: false, message: error.message });
+  }
+};
+
 
 

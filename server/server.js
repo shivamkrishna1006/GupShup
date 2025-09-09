@@ -17,8 +17,11 @@ const server=http.createServer(app)// as socket.io support the http server
 
 //initialize socket io
 export const io= new Server(server,{
-    cors:{origin:"*"} //* allows all the origins
+    cors:{origin: process.env.CORS_ORIGIN} 
 })
+
+console.log("socket initialised");
+
 
 //store online users
 export const userSocketMap={}; //{userid:socketid}
@@ -53,6 +56,8 @@ app.use(cors()); //allows all the urls to connect with the backened
 app.use("/api/status",(req,res)=>{
 res.send("server is live");
 })
+
+
 
 app.use("/api/auth",userRouter)
 app.use("/api/messages",messageRouter)
